@@ -15,11 +15,12 @@ async function submitAuth() {
   const password = document.getElementById('auth-password').value.trim();
   if (!username || !password) return alert("Fill all fields");
 
-  const res = await fetch(isRegistering ? '/register' : '/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-  });
+const res = await fetch(isRegistering ? '/register' : '/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+  credentials: 'include'
+});
 
   if (res.ok) {
     currentUser = username;
@@ -93,7 +94,7 @@ document.getElementById('message-input').addEventListener('input', () => {
 });
 
 socket.on('connect', async () => {
-  const res = await fetch('/me');
+  const res = await fetch('/me', { credentials: 'include' });
   const me = await res.json();
   if (me.nickname) {
     currentUser = me.nickname;
