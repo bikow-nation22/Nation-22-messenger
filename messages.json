@@ -1,0 +1,72 @@
+[
+  {
+    "message": "\ud83d\udea8 This is a forged message",
+    "to": "All",
+    "time": "16:33",
+    "from": "Brianthegreat1"
+  },
+  {
+    "to": "All",
+    "message": "Hello",
+    "time": "21:26",
+    "from": "Brianthegreat1"
+  },
+  {
+    "to": "All",
+    "message": "Plz \ud83d\ude01\ud83e\udd7a\ud83e\udd7a \ud83d\ude2d listen to me",
+    "time": "21:26",
+    "from": "Brianthegreat1"
+  },
+  {
+    "id": "a461cf68-6804-409f-835d-9f310a68614d",
+    "from": "Brianthegreat1",
+    "text": "Hey guys",
+    "time": "23:00"
+  },
+  {
+    "id": "c1437e45-8013-4c99-b52c-48cebe6201c7",
+    "from": "Rapidpaper",
+    "text": "Hello",
+    "to": "Brianthegreat1",
+    "time": "08:59"
+  },
+  {
+    "id": "e27f751b-2844-4eec-bd35-581ab59e3432",
+    "from": "Rapidpaper 1",
+    "text": "Hello",
+    "to": "Rapidpaper",
+    "time": "09:39"
+  },
+  {
+    "id": "eafb8e62-fa87-43f2-9427-5d433899924f",
+    "from": "Rapidpaper 1",
+    "text": "Hi",
+    "to": "Rapidpaper",
+    "time": "09:39"
+  },
+  {
+    "id": "b23dfb83-2f4a-436b-b9e4-dd7a41568777",
+    "from": "Rapidpaper 1",
+    "text": "Phusha",
+    "to": "All",
+    "time": "09:40"
+  },
+  {
+    "id": "df8b1fc9-d653-42e7-96ae-faaf64c1e502",
+    "from": "Brianthegreat1",
+    "text": "Hey",
+    "to": "All",
+    "time": "11:31",
+    "seen_by": [],
+    "delivered": true
+  },
+  {
+    "id": "4aeb9b0a-d7d2-4270-afb3-44ef6a78d50f",
+    "from": "Brianthegreat1",
+    "text": "Hey whatsapp",
+    "to": "All",
+    "seen": false,
+    "delivered": true,
+    "time": "22:08"
+  }
+]

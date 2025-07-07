@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NATION 22 MESSENGER</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icon-css/css/flag-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: #111;
+      color: #21f38d;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #000;
+      color: #21f38d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    #logo { font-weight: bold; font-size: 20px; }
+    #settingsBtn {
+      background: none;
+      border: none;
+      color: #21f38d;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #auth-forms {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #auth-forms input, #auth-forms button {
+      margin: 6px;
+      padding: 10px;
+      border: 1px solid #21f38d;
+      background: #000;
+      color: #21f38d;
+    }
+    #auth-forms button {
+      background: #21f38d;
+      color: #000;
+      cursor: pointer;
+    }
+    #chat-area {
+      flex: 1;
+      display: none;
+      flex-direction: row;
+      overflow: hidden;
+    }
+    #user-list {
+      width: 25%;
+      border-right: 2px solid #21f38d;
+      overflow-y: auto;
+      background: #000;
+    }
+    .user {
+      padding: 10px;
+      border-bottom: 1px solid #21f38d;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .user span.status { font-size: 0.8em; }
+    .online { color: #00ff00; }
+    .offline { color: #888; }
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .from-me { color: #00f7ff; text-align: right; }
+    .from-other { color: #fff; text-align: left; }
+    .delivered::after { content: ' ✔'; color: #0f0; font-size: 0.8em; }
+    .seen::after { content: ' ✔✔'; color: #00f7ff; font-size: 0.8em; }
+    #input-area {
+      display: none;
+      padding: 10px;
+      background: #000;
+      display: flex;
+    }
+    #message-input {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #21f38d;
+      background: #111;
+      color: #fff;
+    }
+    #send-btn, #emoji-btn {
+      background: #21f38d;
+      color: #000;
+      border: none;
+      margin-left: 5px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    #typing-status {
+      height: 20px;
+      font-size: 12px;
+      color: #888;
+      padding-left: 10px;
+    }
+    #settings-modal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 30%;
+      background: #000;
+      color: #21f38d;
+      border: 2px solid #21f38d;
+      padding: 20px;
+      z-index: 99;
+    }
+    #settings-modal button {
+      margin-top: 10px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="logo">NATION 22 MESSENGER <span class="fi fi-us"></span></div>
+    <button id="settingsBtn" onclick="openSettings()">⚙️</button>
+  </header>
+
+  <!-- Auth -->
+  <div id="auth-forms">
+    <h2 id="auth-title">Login</h2>
+    <input type="text" id="auth-username" placeholder="Username" />
+    <input type="password" id="auth-password" placeholder="Password" />
+    <button onclick="submitAuth()">Login</button>
+    <div id="toggle-auth" onclick="toggleAuth()">Don't have an account? Register</div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chat-area">
+    <div id="user-list"></div>
+    <div id="messages"></div>
+  </div>
+
+  <div id="input-area">
+    <input type="text" id="message-input" placeholder="Type your message..." />
+    <button id="emoji-btn">😊</button>
+    <button id="send-btn">Send</button>
+  </div>
+
+  <div id="typing-status"></div>
+
+  <!-- Settings -->
+  <div id="settings-modal">
+    <h3>Edit Profile</h3>
+    <input type="text" id="nickname" placeholder="Nickname" />
+    <input type="file" id="avatarUpload" />
+    <button onclick="saveSettings()">Save</button>
+    <button onclick="closeSettings()">Close</button>
+    <button onclick="createGroup()">Create Group</button>
+    <button onclick="joinGroup()">Join Group</button>
+  </div>
+
+  <script>
+    const socket = io(window.location.origin);
+    let isRegistering = false;
+    let currentUser = "";
+    let currentTarget = "All";
+
+    function toggleAuth() {
+      isRegistering = !isRegistering;
+      document.getElementById('auth-title').textContent = isRegistering ? 'Register' : 'Login';
+      document.querySelector('#auth-forms button').textContent = isRegistering ? 'Register' : 'Login';
+      document.getElementById('toggle-auth').textContent = isRegistering ? 'Already have an account? Login' : "Don't have an account? Register";
+    }
+
+    async function submitAuth() {
+      const username = document.getElementById('auth-username').value.trim();
+      const password = document.getElementById('auth-password').value.trim();
+      if (!username || !password) return alert("Fill all fields");
+
+      const res = await fetch(isRegistering ? '/register' : '/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+      });
+
+      if (res.ok) {
+        currentUser = username;
+        socket.emit('join', username);
+        location.reload();
+      } else alert(await res.text());
+    }
+
+    function openSettings() {
+      document.getElementById('settings-modal').style.display = 'block';
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').style.display = 'none';
+    }
+
+    function saveSettings() {
+      const nickname = document.getElementById('nickname').value;
+      const formData = new FormData();
+      formData.append('nickname', nickname);
+      const file = document.getElementById('avatarUpload').files[0];
+      if (file) formData.append('avatar', file);
+      fetch('/settings', { method: 'POST', body: formData });
+      alert("Saved!");
+      closeSettings();
+    }
+
+    function createGroup() {
+      const name = prompt("Enter group name:");
+      if (name) alert("Group '" + name + "' created!");
+    }
+
+    function joinGroup() {
+      const name = prompt("Enter group name to join:");
+      if (name) alert("Joined group '" + name + "'!");
+    }
+
+    function renderUsers(users) {
+      const list = document.getElementById('user-list');
+      list.innerHTML = '';
+      Object.entries(users).forEach(([username, info]) => {
+        if (username === currentUser) return;
+        const div = document.createElement('div');
+        div.className = 'user';
+        div.innerHTML = `<span>${username}</span><span class="status ${info.online ? 'online' : 'offline'}">${info.online ? 'Online' : 'Offline'}</span>`;
+        div.onclick = () => { currentTarget = username; alert(`Now chatting with ${username}`); };
+        list.appendChild(div);
+      });
+    }
+
+    function renderMessage(msg) {
+      const div = document.createElement('div');
+      const className = msg.from === currentUser ? 'from-me seen' : 'from-other';
+      if (msg.to !== 'All' && msg.to !== currentUser && msg.from !== currentUser) return;
+      div.className = `message ${className}`;
+      div.innerHTML = `<strong>${msg.from}</strong>: ${msg.text}`;
+      document.getElementById('messages').appendChild(div);
+      document.getElementById('messages').scrollTop = 99999;
+    }
+
+    document.getElementById('send-btn').onclick = () => {
+      const text = document.getElementById('message-input').value.trim();
+      if (text) {
+        socket.emit('message', { text, to: currentTarget });
+        document.getElementById('message-input').value = '';
+      }
+    };
+
+    document.getElementById('message-input').addEventListener('input', () => {
+      socket.emit('typing');
+    });
+
+    socket.on('connect', async () => {
+      const res = await fetch('/me');
+      const me = await res.json();
+      if (me.nickname) {
+        currentUser = me.nickname;
+        document.getElementById('auth-forms').style.display = 'none';
+        document.getElementById('chat-area').style.display = 'flex';
+        document.getElementById('input-area').style.display = 'flex';
+        socket.emit('join', me.nickname);
+      }
+    });
+
+    socket.on('user-update', data => renderUsers(data));
+    socket.on('message', msg => renderMessage(msg));
+    socket.on('typing', user => {
+      document.getElementById('typing-status').innerText = `${user} is typing...`;
+      setTimeout(() => document.getElementById('typing-status').innerText = '', 1500);
+    });
+  </script>
+</body>
+</html>

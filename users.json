@@ -1,0 +1,20 @@
+{
+  "Brianthegreat1": {
+    "password": "scrypt:32768:8:1$O50Xw38AXuPGSE8L$a0291de016054b1d55a71dc2a621800f2d426c13b2514a3e46248ef6b17c2f1afd0aaec21ca7a22dcb357f3c6ece61a8a880b91e3ce45446ab243f13fe8102c2",
+    "nickname": "",
+    "avatar": "",
+    "online": false
+  },
+  "Rapidpaper": {
+    "password": "scrypt:32768:8:1$XmHOdUZgfYNIwWOe$2b2fd76a0de5113cd84e26b343f822074bcfb64b5dc68c69b282b81ff26d079c513101f30508ef53d26b724686776624a9fa9d2905a19a1fdc9d6342ec0207c6",
+    "nickname": "",
+    "avatar": "Bikow_Nation_WhatsApp_Profile.png",
+    "online": false
+  },
+  "\ud83d\udc30 bit": {
+    "password": "scrypt:32768:8:1$99GIiYuSOyct6l3S$e60ac90847af8708c4bc36b46d76d4d234a9d37b0d63e54ee3f731e6ecd5156ff96f7076cd810270e8658198375f5dafc2eb905c312afb289630ebf1d7138944",
+    "nickname": "\ud83d\udc30 bit",
+    "avatar": "",
+    "online": true
+  }
+}
