@@ -8,8 +8,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'nation22-secret'
+app.config['SESSION_COOKIE_SAMESITE'] = "None"
+app.config['SESSION_COOKIE_SECURE'] = True
 CORS(app, supports_credentials=True)
-socketio = SocketIO(app, cors_allowed_origins="*", manage_session=True)
 
 USERS_FILE = 'users.json'
 MESSAGES_FILE = 'messages.json'
@@ -46,6 +47,7 @@ def login():
     users = load_users()
     if username in users and check_password_hash(users[username]['password'], password):
         session['user'] = username
+        print("Session user set to:", session.get('user'))  # Debug log
         return '', 200
     return 'Invalid login', 400
 
@@ -64,6 +66,7 @@ def register():
     }
     save_users(users)
     session['user'] = username
+    print("Registered user:", username)  # Debug log
     return '', 200
 
 @app.route('/logout')
