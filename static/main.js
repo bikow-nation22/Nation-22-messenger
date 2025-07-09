@@ -18,8 +18,8 @@ async function submitAuth() {
 const res = await fetch(isRegistering ? '/register' : '/login', {
   method: 'POST',
   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-  credentials: 'include'
+  credentials: 'include',
+  body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
 });
 
   if (res.ok) {
